@@ -3,6 +3,7 @@ from numpy import log
 from scipy.stats import rankdata
 from alphas import Alphas
 from datas import *
+from qmt_util import get_hs300_stocks
 
 def Log(sr):
     #自然对数函数

@@ -13,6 +13,7 @@ from numpy import log
 from numpy import sign
 from alphas import Alphas
 from datas import *
+from qmt_util import get_hs300_stocks
 
 from scipy.stats import rankdata
 

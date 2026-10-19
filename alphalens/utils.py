@@ -163,9 +163,12 @@ def quantize_factor(factor_data,
     if by_group:
         grouper.append('group')
 
-    factor_quantile = factor_data.groupby(grouper)['factor'] \
+    factor_quantile = factor_data.groupby(grouper, group_keys=False)['factor'] \
         .apply(quantile_calc, quantiles, bins, zero_aware, no_raise)
     factor_quantile.name = 'factor_quantile'
+    extra_levels = factor_quantile.index.nlevels - factor_data.index.nlevels
+    if extra_levels > 0:
+        factor_quantile = factor_quantile.droplevel(list(range(extra_levels)))
 
     return factor_quantile.dropna()
 
@@ -316,7 +319,8 @@ def compute_forward_returns(factor,
             period_len = diff_custom_calendar_timedeltas(start, end, freq)
             days_diffs.append(period_len.components.days)
 
-        delta_days = period_len.components.days - mode(days_diffs).mode[0]
+        most_common_days = np.asarray(mode(days_diffs).mode).reshape(-1)[0]
+        delta_days = period_len.components.days - most_common_days
         period_len -= pd.Timedelta(days=delta_days)
         label = timedelta_to_string(period_len)
 

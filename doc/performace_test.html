@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>Alpha191 因子耗时</title>
+<style>
+body { font-family: sans-serif; margin: 24px; line-height: 1.5; }
+table { border-collapse: collapse; margin-top: 12px; }
+th, td { border: 1px solid #ccc; padding: 4px 12px; }
+td:nth-child(n+2), th:nth-child(n+2) { text-align: right; }
+th { cursor: pointer; background: #f4f4f4; user-select: none; }
+th.sort-asc::after { content: " \2191"; }
+th.sort-desc::after { content: " \2193"; }
+</style>
+</head>
+<body>
+<h1>Alpha191 因子耗时</h1>
+<p>来源：终端里一次 alphas191.py 全量计算，输出目录 alphas/Alphas191/2026。进程池并行，墙钟总时间 720.607 秒。表里是每个因子自己的计算时间，相加不等于墙钟时间。</p>
+<p>回看K线：算出当前这根 K 线需要向前用到的根数，含当日。滚动窗口、Delay、Delta 和条件判断用到的窗口会累加。Sma 的参数 n 按 n 根计入；它实际是指数平滑，更早的价格仍有权重。不带窗口的 .std() 用整段样本，不增加固定回看根数。</p>
+<p>生成失败、没有耗时：alpha030、alpha143、alpha149、alpha190。这四个实现直接返回 0，没有回看根数。点击表头可排序。</p>
+<table id="perf">
+<thead>
+<tr>
+<th data-type="text">因子</th>
+<th data-type="num">耗时(秒)</th>
+<th data-type="num">回看K线</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>alpha001</td><td data-v="1.180">1.180</td><td data-v="7">7</td></tr>
+<tr><td>alpha002</td><td data-v="0.548">0.548</td><td data-v="2">2</td></tr>
+<tr><td>alpha003</td><td data-v="0.630">0.630</td><td data-v="7">7</td></tr>
+<tr><td>alpha004</td><td data-v="1.233">1.233</td><td data-v="20">20</td></tr>
+<tr><td>alpha005</td><td data-v="174.907">174.907</td><td data-v="11">11</td></tr>
+<tr><td>alpha006</td><td data-v="0.635">0.635</td><td data-v="5">5</td></tr>
+<tr><td>alpha007</td><td data-v="1.168">1.168</td><td data-v="4">4</td></tr>
+<tr><td>alpha008</td><td data-v="0.663">0.663</td><td data-v="5">5</td></tr>
+<tr><td>alpha009</td><td data-v="0.701">0.701</td><td data-v="8">8</td></tr>
+<tr><td>alpha010</td><td data-v="1.226">1.226</td><td data-v="25">25</td></tr>
+<tr><td>alpha011</td><td data-v="1.156">1.156</td><td data-v="6">6</td></tr>
+<tr><td>alpha012</td><td data-v="0.739">0.739</td><td data-v="10">10</td></tr>
+<tr><td>alpha013</td><td data-v="1.384">1.384</td><td data-v="1">1</td></tr>
+<tr><td>alpha014</td><td data-v="0.880">0.880</td><td data-v="6">6</td></tr>
+<tr><td>alpha015</td><td data-v="0.570">0.570</td><td data-v="2">2</td></tr>
+<tr><td>alpha016</td><td data-v="1.669">1.669</td><td data-v="9">9</td></tr>
+<tr><td>alpha017</td><td data-v="1.400">1.400</td><td data-v="15">15</td></tr>
+<tr><td>alpha018</td><td data-v="0.738">0.738</td><td data-v="6">6</td></tr>
+<tr><td>alpha019</td><td data-v="1.454">1.454</td><td data-v="6">6</td></tr>
+<tr><td>alpha020</td><td data-v="1.244">1.244</td><td data-v="7">7</td></tr>
+<tr><td>alpha021</td><td data-v="55.349">55.349</td><td data-v="11">11</td></tr>
+<tr><td>alpha022</td><td data-v="1.294">1.294</td><td data-v="20">20</td></tr>
+<tr><td>alpha023</td><td data-v="1.253">1.253</td><td data-v="39">39</td></tr>
+<tr><td>alpha024</td><td data-v="1.041">1.041</td><td data-v="10">10</td></tr>
+<tr><td>alpha025</td><td data-v="61.528">61.528</td><td data-v="251">251</td></tr>
+<tr><td>alpha026</td><td data-v="1.619">1.619</td><td data-v="235">235</td></tr>
+<tr><td>alpha027</td><td data-v="64.826">64.826</td><td data-v="18">18</td></tr>
+<tr><td>alpha028</td><td data-v="1.853">1.853</td><td data-v="13">13</td></tr>
+<tr><td>alpha029</td><td data-v="0.660">0.660</td><td data-v="7">7</td></tr>
+<tr><td>alpha030</td><td data-v="">失败</td><td data-v="">-</td></tr>
+<tr><td>alpha031</td><td data-v="1.341">1.341</td><td data-v="12">12</td></tr>
+<tr><td>alpha032</td><td data-v="1.994">1.994</td><td data-v="5">5</td></tr>
+<tr><td>alpha033</td><td data-v="93.242">93.242</td><td data-v="241">241</td></tr>
+<tr><td>alpha034</td><td data-v="1.130">1.130</td><td data-v="12">12</td></tr>
+<tr><td>alpha035</td><td data-v="118.653">118.653</td><td data-v="23">23</td></tr>
+<tr><td>alpha036</td><td data-v="1.557">1.557</td><td data-v="7">7</td></tr>
+<tr><td>alpha037</td><td data-v="1.070">1.070</td><td data-v="16">16</td></tr>
+<tr><td>alpha038</td><td data-v="0.676">0.676</td><td data-v="20">20</td></tr>
+<tr><td>alpha039</td><td data-v="133.549">133.549</td><td data-v="240">240</td></tr>
+<tr><td>alpha040</td><td data-v="0.951">0.951</td><td data-v="27">27</td></tr>
+<tr><td>alpha041</td><td data-v="0.994">0.994</td><td data-v="8">8</td></tr>
+<tr><td>alpha042</td><td data-v="1.457">1.457</td><td data-v="10">10</td></tr>
+<tr><td>alpha043</td><td data-v="0.534">0.534</td><td data-v="7">7</td></tr>
+<tr><td>alpha044</td><td data-v="313.047">313.047</td><td data-v="27">27</td></tr>
+<tr><td>alpha045</td><td data-v="1.729">1.729</td><td data-v="164">164</td></tr>
+<tr><td>alpha046</td><td data-v="0.927">0.927</td><td data-v="24">24</td></tr>
+<tr><td>alpha047</td><td data-v="0.872">0.872</td><td data-v="14">14</td></tr>
+<tr><td>alpha048</td><td data-v="0.824">0.824</td><td data-v="20">20</td></tr>
+<tr><td>alpha049</td><td data-v="1.018">1.018</td><td data-v="13">13</td></tr>
+<tr><td>alpha050</td><td data-v="1.001">1.001</td><td data-v="13">13</td></tr>
+<tr><td>alpha051</td><td data-v="0.815">0.815</td><td data-v="13">13</td></tr>
+<tr><td>alpha052</td><td data-v="0.862">0.862</td><td data-v="27">27</td></tr>
+<tr><td>alpha053</td><td data-v="25.541">25.541</td><td data-v="13">13</td></tr>
+<tr><td>alpha054</td><td data-v="1.128">1.128</td><td data-v="10">10</td></tr>
+<tr><td>alpha055</td><td data-v="0.809">0.809</td><td data-v="21">21</td></tr>
+<tr><td>alpha056</td><td data-v="1.214">1.214</td><td data-v="70">70</td></tr>
+<tr><td>alpha057</td><td data-v="0.909">0.909</td><td data-v="11">11</td></tr>
+<tr><td>alpha058</td><td data-v="30.714">30.714</td><td data-v="21">21</td></tr>
+<tr><td>alpha059</td><td data-v="0.679">0.679</td><td data-v="21">21</td></tr>
+<tr><td>alpha060</td><td data-v="0.978">0.978</td><td data-v="20">20</td></tr>
+<tr><td>alpha061</td><td data-v="126.504">126.504</td><td data-v="103">103</td></tr>
+<tr><td>alpha062</td><td data-v="1.411">1.411</td><td data-v="5">5</td></tr>
+<tr><td>alpha063</td><td data-v="0.732">0.732</td><td data-v="7">7</td></tr>
+<tr><td>alpha064</td><td data-v="76.685">76.685</td><td data-v="88">88</td></tr>
+<tr><td>alpha065</td><td data-v="0.709">0.709</td><td data-v="6">6</td></tr>
+<tr><td>alpha066</td><td data-v="0.801">0.801</td><td data-v="6">6</td></tr>
+<tr><td>alpha067</td><td data-v="1.098">1.098</td><td data-v="25">25</td></tr>
+<tr><td>alpha068</td><td data-v="1.270">1.270</td><td data-v="16">16</td></tr>
+<tr><td>alpha069</td><td data-v="1.874">1.874</td><td data-v="21">21</td></tr>
+<tr><td>alpha070</td><td data-v="1.089">1.089</td><td data-v="6">6</td></tr>
+<tr><td>alpha071</td><td data-v="1.154">1.154</td><td data-v="24">24</td></tr>
+<tr><td>alpha072</td><td data-v="1.261">1.261</td><td data-v="20">20</td></tr>
+<tr><td>alpha073</td><td data-v="263.500">263.500</td><td data-v="35">35</td></tr>
+<tr><td>alpha074</td><td data-v="1.785">1.785</td><td data-v="65">65</td></tr>
+<tr><td>alpha075</td><td data-v="58.028">58.028</td><td data-v="50">50</td></tr>
+<tr><td>alpha076</td><td data-v="0.912">0.912</td><td data-v="21">21</td></tr>
+<tr><td>alpha077</td><td data-v="141.223">141.223</td><td data-v="47">47</td></tr>
+<tr><td>alpha078</td><td data-v="1.267">1.267</td><td data-v="23">23</td></tr>
+<tr><td>alpha079</td><td data-v="1.022">1.022</td><td data-v="13">13</td></tr>
+<tr><td>alpha080</td><td data-v="0.929">0.929</td><td data-v="6">6</td></tr>
+<tr><td>alpha081</td><td data-v="1.008">1.008</td><td data-v="21">21</td></tr>
+<tr><td>alpha082</td><td data-v="1.305">1.305</td><td data-v="25">25</td></tr>
+<tr><td>alpha083</td><td data-v="2.023">2.023</td><td data-v="5">5</td></tr>
+<tr><td>alpha084</td><td data-v="0.956">0.956</td><td data-v="21">21</td></tr>
+<tr><td>alpha085</td><td data-v="149.418">149.418</td><td data-v="39">39</td></tr>
+<tr><td>alpha086</td><td data-v="0.557">0.557</td><td data-v="21">21</td></tr>
+<tr><td>alpha087</td><td data-v="169.043">169.043</td><td data-v="17">17</td></tr>
+<tr><td>alpha088</td><td data-v="0.904">0.904</td><td data-v="21">21</td></tr>
+<tr><td>alpha089</td><td data-v="1.018">1.018</td><td data-v="36">36</td></tr>
+<tr><td>alpha090</td><td data-v="1.244">1.244</td><td data-v="5">5</td></tr>
+<tr><td>alpha091</td><td data-v="2.084">2.084</td><td data-v="44">44</td></tr>
+<tr><td>alpha092</td><td data-v="205.559">205.559</td><td data-v="210">210</td></tr>
+<tr><td>alpha093</td><td data-v="1.099">1.099</td><td data-v="21">21</td></tr>
+<tr><td>alpha094</td><td data-v="0.565">0.565</td><td data-v="31">31</td></tr>
+<tr><td>alpha095</td><td data-v="1.070">1.070</td><td data-v="20">20</td></tr>
+<tr><td>alpha096</td><td data-v="1.109">1.109</td><td data-v="13">13</td></tr>
+<tr><td>alpha097</td><td data-v="0.808">0.808</td><td data-v="10">10</td></tr>
+<tr><td>alpha098</td><td data-v="0.827">0.827</td><td data-v="200">200</td></tr>
+<tr><td>alpha099</td><td data-v="1.254">1.254</td><td data-v="5">5</td></tr>
+<tr><td>alpha100</td><td data-v="1.005">1.005</td><td data-v="20">20</td></tr>
+<tr><td>alpha101</td><td data-v="1.574">1.574</td><td data-v="80">80</td></tr>
+<tr><td>alpha102</td><td data-v="0.790">0.790</td><td data-v="7">7</td></tr>
+<tr><td>alpha103</td><td data-v="17.256">17.256</td><td data-v="20">20</td></tr>
+<tr><td>alpha104</td><td data-v="1.453">1.453</td><td data-v="20">20</td></tr>
+<tr><td>alpha105</td><td data-v="1.595">1.595</td><td data-v="10">10</td></tr>
+<tr><td>alpha106</td><td data-v="0.814">0.814</td><td data-v="21">21</td></tr>
+<tr><td>alpha107</td><td data-v="1.001">1.001</td><td data-v="2">2</td></tr>
+<tr><td>alpha108</td><td data-v="1.722">1.722</td><td data-v="125">125</td></tr>
+<tr><td>alpha109</td><td data-v="1.049">1.049</td><td data-v="19">19</td></tr>
+<tr><td>alpha110</td><td data-v="1.275">1.275</td><td data-v="21">21</td></tr>
+<tr><td>alpha111</td><td data-v="1.213">1.213</td><td data-v="11">11</td></tr>
+<tr><td>alpha112</td><td data-v="0.978">0.978</td><td data-v="13">13</td></tr>
+<tr><td>alpha113</td><td data-v="1.898">1.898</td><td data-v="25">25</td></tr>
+<tr><td>alpha114</td><td data-v="0.979">0.979</td><td data-v="7">7</td></tr>
+<tr><td>alpha115</td><td data-v="172.410">172.410</td><td data-v="39">39</td></tr>
+<tr><td>alpha116</td><td data-v="54.246">54.246</td><td data-v="20">20</td></tr>
+<tr><td>alpha117</td><td data-v="268.531">268.531</td><td data-v="33">33</td></tr>
+<tr><td>alpha118</td><td data-v="1.232">1.232</td><td data-v="20">20</td></tr>
+<tr><td>alpha119</td><td data-v="221.652">221.652</td><td data-v="56">56</td></tr>
+<tr><td>alpha120</td><td data-v="0.863">0.863</td><td data-v="1">1</td></tr>
+<tr><td>alpha121</td><td data-v="249.139">249.139</td><td data-v="80">80</td></tr>
+<tr><td>alpha122</td><td data-v="0.951">0.951</td><td data-v="38">38</td></tr>
+<tr><td>alpha123</td><td data-v="1.983">1.983</td><td data-v="87">87</td></tr>
+<tr><td>alpha124</td><td data-v="74.807">74.807</td><td data-v="31">31</td></tr>
+<tr><td>alpha125</td><td data-v="139.984">139.984</td><td data-v="115">115</td></tr>
+<tr><td>alpha126</td><td data-v="0.854">0.854</td><td data-v="1">1</td></tr>
+<tr><td>alpha127</td><td data-v="1.354">1.354</td><td data-v="23">23</td></tr>
+<tr><td>alpha128</td><td data-v="1.075">1.075</td><td data-v="15">15</td></tr>
+<tr><td>alpha129</td><td data-v="1.039">1.039</td><td data-v="13">13</td></tr>
+<tr><td>alpha130</td><td data-v="144.190">144.190</td><td data-v="57">57</td></tr>
+<tr><td>alpha131</td><td data-v="91.609">91.609</td><td data-v="84">84</td></tr>
+<tr><td>alpha132</td><td data-v="1.076">1.076</td><td data-v="20">20</td></tr>
+<tr><td>alpha133</td><td data-v="43.340">43.340</td><td data-v="20">20</td></tr>
+<tr><td>alpha134</td><td data-v="1.480">1.480</td><td data-v="13">13</td></tr>
+<tr><td>alpha135</td><td data-v="1.153">1.153</td><td data-v="41">41</td></tr>
+<tr><td>alpha136</td><td data-v="1.746">1.746</td><td data-v="10">10</td></tr>
+<tr><td>alpha137</td><td data-v="0.992">0.992</td><td data-v="2">2</td></tr>
+<tr><td>alpha138</td><td data-v="278.009">278.009</td><td data-v="119">119</td></tr>
+<tr><td>alpha139</td><td data-v="1.904">1.904</td><td data-v="10">10</td></tr>
+<tr><td>alpha140</td><td data-v="271.675">271.675</td><td data-v="94">94</td></tr>
+<tr><td>alpha141</td><td data-v="1.568">1.568</td><td data-v="23">23</td></tr>
+<tr><td>alpha142</td><td data-v="157.675">157.675</td><td data-v="24">24</td></tr>
+<tr><td>alpha143</td><td data-v="">失败</td><td data-v="">-</td></tr>
+<tr><td>alpha144</td><td data-v="28.205">28.205</td><td data-v="21">21</td></tr>
+<tr><td>alpha145</td><td data-v="1.126">1.126</td><td data-v="26">26</td></tr>
+<tr><td>alpha146</td><td data-v="0.900">0.900</td><td data-v="122">122</td></tr>
+<tr><td>alpha147</td><td data-v="52.294">52.294</td><td data-v="23">23</td></tr>
+<tr><td>alpha148</td><td data-v="1.188">1.188</td><td data-v="73">73</td></tr>
+<tr><td>alpha149</td><td data-v="">失败</td><td data-v="">-</td></tr>
+<tr><td>alpha150</td><td data-v="0.697">0.697</td><td data-v="1">1</td></tr>
+<tr><td>alpha151</td><td data-v="0.669">0.669</td><td data-v="40">40</td></tr>
+<tr><td>alpha152</td><td data-v="0.978">0.978</td><td data-v="53">53</td></tr>
+<tr><td>alpha153</td><td data-v="0.903">0.903</td><td data-v="24">24</td></tr>
+<tr><td>alpha154</td><td data-v="0.971">0.971</td><td data-v="197">197</td></tr>
+<tr><td>alpha155</td><td data-v="1.115">1.115</td><td data-v="36">36</td></tr>
+<tr><td>alpha156</td><td data-v="122.678">122.678</td><td data-v="8">8</td></tr>
+<tr><td>alpha157</td><td data-v="106.214">106.214</td><td data-v="12">12</td></tr>
+<tr><td>alpha158</td><td data-v="0.785">0.785</td><td data-v="15">15</td></tr>
+<tr><td>alpha159</td><td data-v="1.097">1.097</td><td data-v="25">25</td></tr>
+<tr><td>alpha160</td><td data-v="1.023">1.023</td><td data-v="39">39</td></tr>
+<tr><td>alpha161</td><td data-v="0.808">0.808</td><td data-v="13">13</td></tr>
+<tr><td>alpha162</td><td data-v="1.096">1.096</td><td data-v="24">24</td></tr>
+<tr><td>alpha163</td><td data-v="0.775">0.775</td><td data-v="20">20</td></tr>
+<tr><td>alpha164</td><td data-v="0.927">0.927</td><td data-v="25">25</td></tr>
+<tr><td>alpha165</td><td data-v="0.989">0.989</td><td data-v="95">95</td></tr>
+<tr><td>alpha166</td><td data-v="0.961">0.961</td><td data-v="40">40</td></tr>
+<tr><td>alpha167</td><td data-v="0.707">0.707</td><td data-v="13">13</td></tr>
+<tr><td>alpha168</td><td data-v="0.746">0.746</td><td data-v="20">20</td></tr>
+<tr><td>alpha169</td><td data-v="0.933">0.933</td><td data-v="45">45</td></tr>
+<tr><td>alpha170</td><td data-v="0.891">0.891</td><td data-v="20">20</td></tr>
+<tr><td>alpha171</td><td data-v="0.702">0.702</td><td data-v="1">1</td></tr>
+<tr><td>alpha172</td><td data-v="1.344">1.344</td><td data-v="20">20</td></tr>
+<tr><td>alpha173</td><td data-v="0.849">0.849</td><td data-v="37">37</td></tr>
+<tr><td>alpha174</td><td data-v="1.042">1.042</td><td data-v="39">39</td></tr>
+<tr><td>alpha175</td><td data-v="1.037">1.037</td><td data-v="7">7</td></tr>
+<tr><td>alpha176</td><td data-v="1.465">1.465</td><td data-v="17">17</td></tr>
+<tr><td>alpha177</td><td data-v="14.443">14.443</td><td data-v="20">20</td></tr>
+<tr><td>alpha178</td><td data-v="0.681">0.681</td><td data-v="2">2</td></tr>
+<tr><td>alpha179</td><td data-v="1.731">1.731</td><td data-v="61">61</td></tr>
+<tr><td>alpha180</td><td data-v="69.635">69.635</td><td data-v="67">67</td></tr>
+<tr><td>alpha181</td><td data-v="1.005">1.005</td><td data-v="40">40</td></tr>
+<tr><td>alpha182</td><td data-v="25.336">25.336</td><td data-v="20">20</td></tr>
+<tr><td>alpha183</td><td data-v="1.010">1.010</td><td data-v="47">47</td></tr>
+<tr><td>alpha184</td><td data-v="0.958">0.958</td><td data-v="201">201</td></tr>
+<tr><td>alpha185</td><td data-v="0.664">0.664</td><td data-v="1">1</td></tr>
+<tr><td>alpha186</td><td data-v="1.856">1.856</td><td data-v="26">26</td></tr>
+<tr><td>alpha187</td><td data-v="0.721">0.721</td><td data-v="21">21</td></tr>
+<tr><td>alpha188</td><td data-v="0.829">0.829</td><td data-v="11">11</td></tr>
+<tr><td>alpha189</td><td data-v="0.782">0.782</td><td data-v="11">11</td></tr>
+<tr><td>alpha190</td><td data-v="">失败</td><td data-v="">-</td></tr>
+<tr><td>alpha191</td><td data-v="1.466">1.466</td><td data-v="24">24</td></tr>
+</tbody>
+</table>
+<script>
+const table = document.getElementById("perf");
+const headers = [...table.tHead.rows[0].cells];
+headers.forEach((th, index) => {
+  th.addEventListener("click", () => {
+    const asc = th.dataset.dir !== "asc";
+    headers.forEach(h => {
+      h.dataset.dir = "";
+      h.classList.remove("sort-asc", "sort-desc");
+    });
+    th.dataset.dir = asc ? "asc" : "desc";
+    th.classList.add(asc ? "sort-asc" : "sort-desc");
+    const bodyRows = [...table.tBodies[0].rows];
+    bodyRows.sort((a, b) => {
+      const av = a.cells[index].dataset.v ?? a.cells[index].textContent;
+      const bv = b.cells[index].dataset.v ?? b.cells[index].textContent;
+      const aEmpty = av === "";
+      const bEmpty = bv === "";
+      if (aEmpty || bEmpty) return aEmpty - bEmpty;
+      if (th.dataset.type === "num") return asc ? av - bv : bv - av;
+      return asc ? av.localeCompare(bv) : bv.localeCompare(av);
+    });
+    bodyRows.forEach(row => table.tBodies[0].appendChild(row));
+  });
+});
+</script>
+</body>
+</html>

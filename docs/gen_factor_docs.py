@@ -527,7 +527,7 @@ def analyze(factor_data):
         mean_quant_rateret_bydate, qmax, qmin, std_err=compstd
     )
     ic = perf.factor_information_coefficient(factor_data, False)
-    monthly = perf.mean_information_coefficient(factor_data, group_adjust=False, by_group=False, by_time="M")
+    monthly = perf.mean_information_coefficient(factor_data, group_adjust=False, by_group=False, by_time="ME")
     periods = utils.get_forward_returns_columns(factor_data.columns, require_exact_day_multiple=True).tolist()
     turnover_periods = utils.timedelta_strings_to_integers(periods)
     quantile_factor = factor_data["factor_quantile"]

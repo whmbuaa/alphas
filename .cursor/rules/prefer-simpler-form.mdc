@@ -1,0 +1,25 @@
+---
+description: 结果相同的代码收成更短的写法
+alwaysApply: true
+---
+
+# 能简化就用简化写法
+
+一段代码如果和更短的写法结果相同，就用短的。先确认边界值也一样，再删掉多余的分支或只为转发的变量。
+
+- 某个分支的结果已经被剩下的表达式覆盖（例如 `polls == 0` 时向上取整本来就是 0），去掉这个分支
+- 局部变量赋完立刻 `return`，中间没有别的使用，就直接 `return` 那个表达式
+- 分支结果确实不同的，仍按「分支用 if/else，末尾一次 return」来写，不要为了变短在每个分支里各 `return` 一次
+- 不要为了变短去抽一个只用一次的函数
+
+```python
+# 不要：0 的情况公式已经算出来了，还单独分支
+if polls == 0:
+    slots = 0
+else:
+    slots = (polls + self.compression - 1) // self.compression
+return slots
+
+# 要
+return (polls + self.compression - 1) // self.compression
+```

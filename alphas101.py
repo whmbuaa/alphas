@@ -6,6 +6,10 @@
 # @Last modification time: 2022.09.01
 # @FileName: alpha101_adjusted.py
 
+import argparse
+import sys
+from datetime import date
+
 import numpy as np
 import pandas as pd
 from numpy import abs
@@ -13,7 +17,7 @@ from numpy import log
 from numpy import sign
 from alphas import Alphas
 from datas import *
-from qmt_util import get_hs300_stocks
+from tushare_util import get_hs300_stocks
 
 from scipy.stats import rankdata
 
@@ -729,12 +733,25 @@ class Alphas101(Alphas):
 
 
 if __name__ == '__main__':
-    year = '2013'
-    list_assets,df_asserts = get_hs300_stocks(f'{year}-01-01')
+    parser = argparse.ArgumentParser(description='计算 Alpha101 因子')
+    parser.add_argument('--year', help='年份，默认今年')
+    parser.add_argument('--alphas', help='因子编号，逗号分隔。不传则计算全部')
+    named_argv = ['--' + arg if '=' in arg and not arg.startswith('-') else arg for arg in sys.argv[1:]]
+    args = parser.parse_args(named_argv)
 
-    ################ 计算所有 #################   
-    Alphas101.generate_alphas(year, list_assets,"sh000300")
+    year = args.year if args.year else str(date.today().year)
+    list_assets, df_asserts = get_hs300_stocks(f'{year}-01-01')
 
-    ################ 计算单个 #################
-    # ret = Alphas101.generate_alpha_single('alpha096', year, list_assets, "sh000300", True)
-    # print(ret)
+    if not args.alphas:
+        # 没有指定编号，计算全部因子
+        Alphas101.generate_alphas(year, list_assets, "sh000300")
+    else:
+        # 按传入编号逐个计算并保存
+        for num in args.alphas.replace('，', ',').split(','):
+            num = num.strip()
+            if not num:
+                continue
+            if num.lower().startswith('alpha'):
+                num = num[5:]
+            alpha_name = f'alpha{int(num):03d}'
+            Alphas101.generate_alpha_single(alpha_name, year, list_assets, "sh000300", True)

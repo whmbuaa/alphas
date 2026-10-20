@@ -1,0 +1,29 @@
+---
+description: 会影响后面参数的参数放在前面
+alwaysApply: true
+---
+
+# 影响后面参数的参数放前面
+
+一个参数会改变后面参数的含义，或让它们失效时，把它放在那些参数前面。读签名的人先看到开关，再看到被它影响的参数。
+
+- 注释里的参数顺序和签名一致
+- 只是默认值、互不影响的参数，保持调用方已经在用的顺序
+
+```python
+# 不要：latest_only 让 compression 和 max_history_tick_count 失效，却写在它们后面
+def __init__(
+    self,
+    compression=1,
+    max_history_tick_count=-1,
+    latest_only=False,
+):
+
+# 要
+def __init__(
+    self,
+    latest_only=False,
+    compression=1,
+    max_history_tick_count=-1,
+):
+```

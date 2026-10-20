@@ -1,0 +1,22 @@
+---
+description: 改代码时同步检查 log 文案是否还指得对
+alwaysApply: true
+---
+
+# 改代码时同步改 log
+
+变量、成员、函数改名或语义变了，同一轮检查附近的 `logger` / `print` 文案。不要留下已经不存在的名字。
+
+- 日志里写的标识应和当前变量名、成员名一致，例如字典已是 `latest_ticks` 就不要再写 `today_tick_data`
+- 删掉或换掉返回值时，把「返回了 xxx」这类 log 一并改掉或删掉
+- 只改实现、对外含义没变的，可以保留用户能看懂的说法；名字已经对不上时必须改
+
+```python
+# 不要：变量已是 latest_ticks，log 还写旧名
+latest_ticks = reader.latest()
+logger.info("today_tick_data keys=%s", len(latest_ticks))
+
+# 要
+latest_ticks = reader.latest()
+logger.info("latest_ticks keys=%s", len(latest_ticks))
+```

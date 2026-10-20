@@ -1,0 +1,27 @@
+---
+description: 变量名一眼能看出含义，同时避免过长
+alwaysApply: true
+---
+
+# 命名：含义清楚，但不要过长
+
+取名要让读者不看赋值就能知道**这个值是什么**，同时控制长度。不要用 `data`、`latest`、`tmp`、`info`、`sampled` 这种空泛或只描述加工过程的词单独当名字。
+
+- 点出关键含义即可：`latest_time_tag` 比 `latest` 清楚，也比 `latest_tick_time_tag_from_incremental_batch` 短
+- 常见类型用短而稳的后缀：`_df`、`_tag`、`_lock`、`_path`、`_count`、`_event`；不要堆形容词。`threading.Event` 用 `_stop_event`，不要只用 `_stop`
+- 循环下标可以短（`i`、`n`）。局部变量同样要能看懂，不要用 `t`、`x`、`tmp` 指代有角色的对象
+- 作为 `Thread(target=...)` 的函数名以 `_thread_func` 结尾，例如 `_poll_thread_func`
+
+```python
+# 不要
+latest = self._latest_tick_time(batch)
+self._stop = threading.Event()
+t = self._poll_thread
+sampled = batch[code]
+
+# 要
+latest_time_tag = self._latest_tick_time(batch)
+self._stop_event = threading.Event()
+poll_thread = self._poll_thread
+incr_tick_df = batch[code]
+```

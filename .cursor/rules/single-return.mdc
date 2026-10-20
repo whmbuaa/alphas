@@ -1,0 +1,29 @@
+---
+description: 分支收成 if/else，函数末尾一次 return
+alwaysApply: true
+---
+
+# 分支用 if/else，末尾一次 return
+
+同一段逻辑不要在多个分支里各写一次 `return`。用 `if/else` 把每个分支的结果赋给同一个变量，函数末尾 `return` 一次。每个分支前加一行注释，说明这个分支在做什么。
+
+中间返回会把后面的分支藏起来，读的人要在函数里来回跳。
+
+空输入、失败这种整段不做的，可以在最前面返回一次。后面的正常分支仍收成 `if/else`。
+
+```python
+# 不要：两个分支各 return 一次
+if live_ticks is not None:
+    return dict(live_ticks)
+tick_data = self._today_tick_data
+return {code: tick_data[code].iloc[[-1]].copy() for code in tick_data}
+
+# 要：结果放进同一个变量，末尾返回
+if live_ticks is not None:
+    # 已有本拍快照
+    latest_ticks = dict(live_ticks)
+else:
+    # 还没有 live 快照：从历史表拷贝末行
+    latest_ticks = {code: tick_data[code].iloc[[-1]].copy() for code in tick_data}
+return latest_ticks
+```

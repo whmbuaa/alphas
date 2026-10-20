@@ -1,0 +1,21 @@
+---
+description: 删代码时同步清测试文档；新依赖同时装系统 Python 和 .venv
+alwaysApply: true
+---
+
+# 删除与依赖
+
+删掉不必要的代码时，**同一轮**去掉所有连带物，不要留死引用：
+
+- 测试、手动 demo、仅服务于该代码的脚本
+- 文档段落、`modules.md` 条目、注释里的 import/路径
+- 空目录、临时数据（如 `_filelock_tmp`）
+
+# 新依赖双环境
+
+写入 `pyproject.toml` 并更新 `uv.lock` 之后，**两个环境都要装上**，不要只用 `--no-sync` 改锁文件：
+
+- `.venv`：`uv pip install --python .venv/Scripts/python.exe <包>`（避免 `uv sync` 动 xtquant）
+- 系统 Python：`python -m pip install <包>`（跑 QMT / xtquant 常用这一套）
+
+装完用对应解释器 `import` 确认。

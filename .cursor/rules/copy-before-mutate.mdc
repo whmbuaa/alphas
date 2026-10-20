@@ -1,0 +1,26 @@
+---
+description: 改共用对象前再拷贝，并注释它和谁共用
+alwaysApply: true
+---
+
+# 改共用对象前再拷贝
+
+只读不用拷贝。要改一份和别处共用的对象时，`copy()` 紧挨在修改前面，并写一行注释，说明它和谁共用。
+
+- 前面的读取用原对象
+- 不要一拿到就拷，把拷贝搁在还没改它的代码前面
+- 注释点出共用关系，例如返回值和内部快照是同一张表
+
+```python
+# 不要：一拿到就 copy，读 timetag 并不改表
+latest_tick_df = latest_tick_df.copy()
+time_tag = TimeTag(int(latest_tick_df["timetag"].iloc[0]))
+latest_tick_df["timetag"] = f"{time_tag.hour:02d}:{time_tag.minute:02d}:{time_tag.second:02d}"
+
+# 要：只读用原对象；改之前再 copy，并写明它和谁共用
+time_tag = TimeTag(int(latest_tick_df["timetag"].iloc[0]))
+
+# latest() 与内部快照共用这一行，改 timetag 前先拷贝
+latest_tick_df = latest_tick_df.copy()
+latest_tick_df["timetag"] = f"{time_tag.hour:02d}:{time_tag.minute:02d}:{time_tag.second:02d}"
+```

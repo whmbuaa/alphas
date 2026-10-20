@@ -1,0 +1,24 @@
+---
+description: 数据结构尽量用最简单的类型，按下游真正需要的来存
+alwaysApply: true
+---
+
+# 数据结构尽量简单
+
+成员和局部变量用下游真正要用的类型。不要为了「更严谨」先套一层 set/dict/自定义结构，用的时候再转回去。
+
+- 后面要交给只要 list 的 API（如 `isin`、循环、拼接），就存 `list`；只有真的要去重或 `in` 查找才用 `set`
+- 需要区分「全部」和「一个都不要」时，用 `None` vs `[]`，判断写 `is not None`。不要 `list(x or ())`，空列表会被当成全部
+- 不要为了可能用到的特性提前升级类型；等真有查找、映射、互斥状态时再改
+
+```python
+# 不要：set 只为去重，isin 又要 list；也不要用 or () 把 [] 吃成全部
+self.stock_codes = list(stock_codes or ())
+if self.stock_codes:
+    table = table.filter(pc.field("stock_code").isin(self.stock_codes))
+
+# 要：None 全取，[] 一只都不取，成员仍是 list 或 None
+self.stock_codes = None if stock_codes is None else list(stock_codes)
+if self.stock_codes is not None:
+    table = table.filter(pc.field("stock_code").isin(self.stock_codes))
+```

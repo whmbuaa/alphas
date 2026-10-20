@@ -1,0 +1,24 @@
+---
+description: 非必要的锁和函数先不增加
+alwaysApply: true
+---
+
+# 非必要的锁和函数先不增加
+
+先写直接能工作的代码。不要为「以后可能并发」「看起来更完整」提前加锁或抽函数。
+
+- 换指针 / 整份赋值在 CPython 上是原子的，读的一方先赋给局部变量再用即可，不必为取成员包一层带锁函数
+- 只有确实有多处同时改同一可变对象、或反复访问成员会错开版本时，再加锁
+- 跨进程文件（如 parquet 追加）该用的锁（如 `FileLock`）要留；线程里可有可无的 `Lock` 先不要加
+- 只在两三处出现、一共几行的逻辑写在调用处，不要先抽 `_parse_xxx` / `_current_xxx`
+
+```python
+# 不要：只为 return 成员加锁、再包一层函数
+def _current_tick_data(self):
+    with self._data_lock:
+        return self._today_tick_data
+tick_data = self._current_tick_data()
+
+# 要：取一次局部变量
+tick_data = self._today_tick_data
+```

@@ -1,0 +1,28 @@
+---
+description: 新函数要写行为、参数和返回
+alwaysApply: true
+---
+
+# 新函数写清行为、参数、返回
+
+新写的函数和方法，在 `def` 上方用注释写三块：函数在做什么、每个参数、返回值。会抛给调用方的异常也写上。
+
+- 第一行是行为，不要只把函数名翻译一遍
+- 参数写名字、类型、含义。没有参数写 `无`
+- 返回写类型和含义。没有返回值写 `None`
+- 已有函数只改实现、对外含义没变的，不必补这段注释
+
+```python
+# 不要：没有说明，或者只复述名字
+def append_row_group(tick_df):
+    ...
+
+# 要
+# 把一张 tick 表追加成一个 row group。文件不存在时新建。
+# 参数:
+#     tick_df (pandas.DataFrame): 带 stock_code 列的一轮行情。
+# 返回:
+#     int: 写入后的总行组数。
+def append_row_group(tick_df: pd.DataFrame) -> int:
+    ...
+```

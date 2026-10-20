@@ -1,0 +1,26 @@
+---
+description: 没被用到的 import 同一轮删掉
+alwaysApply: true
+---
+
+# 没必要的 import 删掉
+
+import 进来的名字要在这个文件里用到。改完代码后看一眼文件头，没人引用的 import 同一轮删掉，不要留着「以后可能用」。
+
+- 只为创建一个再没人用的变量（如 `logger = logging.getLogger`）而 import 的，变量和 import 一起删
+- `__init__.py` 里再导出、写进 `__all__` 的算用到了
+- 只为副作用而 import 的（如 import 时读 `.env`）留着，旁边加一行注释说明副作用
+
+```python
+# 不要：logger 没有日志在用
+import logging
+
+logger = logging.getLogger(__name__)
+
+def append_full_tick(stock_codes):
+    tick_dict = xtdata.get_full_tick(list(stock_codes))
+
+# 要
+def append_full_tick(stock_codes):
+    tick_dict = xtdata.get_full_tick(list(stock_codes))
+```

@@ -1,9 +1,13 @@
+import argparse
+import sys
+from datetime import date
+
 import numpy as np
 from numpy import log
 from scipy.stats import rankdata
 from alphas import Alphas
 from datas import *
-from qmt_util import get_hs300_stocks
+from tushare_util import get_hs300_stocks
 
 def Log(sr):
     #自然对数函数
@@ -152,7 +156,7 @@ class Alphas191(Alphas):
         cond2 = (self.close > Delay(self.close,1))
         cond3 = (self.close < Delay(self.close,1))
         part = self.close.copy(deep=True)
-        part.loc[:, :] = None
+        part.loc[:, :] = np.nan
         part[cond1] = 0
         part[cond2] = self.close - Min(self.low,Delay(self.close,1))
         part[cond3] = self.close - Max(self.high,Delay(self.close,1))
@@ -165,7 +169,7 @@ class Alphas191(Alphas):
         cond3 = ((Sum(self.close, 8)/8 + Std(self.close, 8)) == Sum(self.close, 2)/2)
         cond4 = (self.volume/Mean(self.volume, 20) >= 1)
         part = self.close.copy(deep=True) 
-        part.loc[:, :] = None
+        part.loc[:, :] = np.nan
         part[cond1] = -1
         part[cond2] = 1
         part[cond3] = -1
@@ -197,7 +201,7 @@ class Alphas191(Alphas):
         ####(RANK(MAX(((RET < 0) ? STD(RET, 20) : CLOSE)^2),5))###
         cond = (self.returns < 0)
         part = self.returns.copy(deep=True) 
-        part.loc[:, :] = None
+        part.loc[:, :] = np.nan
         part[cond] = Std(self.returns, 20)
         part[~cond] = self.close
         part = part**2
@@ -242,7 +246,7 @@ class Alphas191(Alphas):
         cond2 = (self.close == Delay(self.close,5))
         cond3 = (self.close > Delay(self.close,5))
         part = self.close.copy(deep=True) 
-        part.loc[:, :] = None
+        part.loc[:, :] = np.nan
         part[cond1] = (self.close-Delay(self.close,5))/Delay(self.close,5)
         part[cond2] = 0
         part[cond3] = (self.close-Delay(self.close,5))/self.close
@@ -265,11 +269,11 @@ class Alphas191(Alphas):
         ####SMA((CLOSE>DELAY(CLOSE,1)?STD(CLOSE,20):0),20,1) / (SMA((CLOSE>DELAY(CLOSE,1)?STD(CLOSE,20):0),20,1) + SMA((CLOSE<=DELAY(CLOSE,1)?STD(CLOSE,20):0),20,1))*100###
         cond = (self.close > Delay(self.close,1))
         part1 = self.close.copy(deep=True) 
-        part1.loc[:, :] = None
+        part1.loc[:, :] = np.nan
         part1[cond] = Std(self.close,20)
         part1[~cond] = 0
         part2 = self.close.copy(deep=True) 
-        part2.loc[:, :] = None
+        part2.loc[:, :] = np.nan
         part2[~cond] = Std(self.close,20)
         part2[cond] = 0
         
@@ -336,7 +340,7 @@ class Alphas191(Alphas):
         ####(((SUM(HIGH, 20) / 20) < HIGH) ? (-1 * DELTA(HIGH, 2)) : 0)
         cond = ((Sum(self.high, 20) / 20) < self.high)
         part = self.close.copy(deep=True)
-        part.loc[:, :] = None
+        part.loc[:, :] = np.nan
         part[cond] = -1 * Delta(self.high, 2)
         part[~cond] = 0
         
@@ -350,11 +354,11 @@ class Alphas191(Alphas):
         ####SUM((CLOSE>DELAY(CLOSE,1)?VOLUME:0),26)/SUM((CLOSE<=DELAY(CLOSE,1)?VOLUME:0),26)*100###
         cond = (self.close > Delay(self.close,1))
         part1 = self.close.copy(deep=True)
-        part1.loc[:, :] = None
+        part1.loc[:, :] = np.nan
         part1[cond] = self.volume
         part1[~cond] = 0
         part2 = self.close.copy(deep=True)
-        part2.loc[:, :] = None
+        part2.loc[:, :] = np.nan
         part2[~cond] = self.volume
         part2[cond] = 0
 
@@ -374,7 +378,7 @@ class Alphas191(Alphas):
         cond2 = (self.close < Delay(self.close,1))
         cond3 = (self.close == Delay(self.close,1))
         part = self.close.copy(deep=True) # pd.Series(np.zeros(self.close.shape))
-        part.loc[:, :] = None
+        part.loc[:, :] = np.nan
         part[cond1] = self.volume
         part[cond2] = -self.volume
         part[cond3] = 0
@@ -405,11 +409,11 @@ class Alphas191(Alphas):
         ####SUM(((HIGH+LOW)>=(DELAY(HIGH,1)+DELAY(LOW,1))?0:MAX(ABS(HIGH-DELAY(HIGH,1)),ABS(LOW-DELAY(LOW,1)))),12) / (SUM(((HIGH+LOW)>=(DELAY(HIGH,1)+DELAY(LOW,1))?0:MAX(ABS(HIGH-DELAY(HIGH,1)),ABS(LOW-DELAY(LOW,1)))),12) + SUM(((HIGH+LOW)<=(DELAY(HIGH,1)+DELAY(LOW,1))?0:MAX(ABS(HIGH-DELAY(HIGH,1)),ABS(LOW-DELAY(LOW,1)))),12))
         cond = ((self.high + self.low) > (Delay(self.high,1) + Delay(self.low,1)))
         part1 = self.close.copy(deep=True) # pd.Series(np.zeros(self.close.shape))
-        part1.loc[:, :] = None
+        part1.loc[:, :] = np.nan
         part1[cond] = 0
         part1[~cond] = Max(Abs(self.high - Delay(self.high,1)), Abs(self.low - Delay(self.low,1)))
         part2 = self.close.copy(deep=True)
-        part2.loc[:, :] = None
+        part2.loc[:, :] = np.nan
         part2[~cond] = 0
         part2[cond] = Max(Abs(self.high - Delay(self.high,1)), Abs(self.low - Delay(self.low,1)))
         
@@ -419,11 +423,11 @@ class Alphas191(Alphas):
         ####SUM(((HIGH+LOW)<=(DELAY(HIGH,1)+DELAY(LOW,1))?0:MAX(ABS(HIGH-DELAY(HIGH,1)),ABS(LOW-DELAY(LOW,1)))),12)/(SUM(((HIGH+LOW)<=(DELAY(HIGH,1)+DELAY(LOW,1))?0:MAX(ABS(HIGH-DELAY(HIGH,1)),ABS(LOW-DELAY(LOW,1)))),12)+SUM(((HIGH+LOW)>=(DELAY(HIGH,1)+DELAY(LOW,1))?0:MAX(ABS(HIGH-DELAY(HIGH,1)),ABS(LOW-DELAY(LOW,1)))),12))-SUM(((HIGH+LOW)>=(DELAY(HIGH,1)+DELAY(LOW,1))?0:MAX(ABS(HIGH-DELAY(HIGH,1)),ABS(LOW-DELAY(LOW,1)))),12)/(SUM(((HIGH+LOW)>=(DELAY(HIGH,1)+DELAY(LOW,1))?0:MAX(ABS(HIGH-DELAY(HIGH,1)),ABS(LOW-DELAY(LOW,1)))),12)+SUM(((HIGH+LOW)<=(DELAY(HIGH,1)+DELAY(LOW,1))?0:MAX(ABS(HIGH-DELAY(HIGH,1)),ABS(LOW-DELAY(LOW,1)))),12))###
         cond = ((self.high + self.low) <= (Delay(self.high,1) + Delay(self.low,1)))
         part1 = self.close.copy(deep=True)
-        part1.loc[:, :] = None
+        part1.loc[:, :] = np.nan
         part1[cond] = 0
         part1[~cond] = Max(Abs(self.high - Delay(self.high,1)), Abs(self.low - Delay(self.low,1)))
         part2 = self.close.copy(deep=True)
-        part2.loc[:, :] = None
+        part2.loc[:, :] = np.nan
         part2[~cond] = 0
         part2[cond] = Max(Abs(self.high - Delay(self.high,1)), Abs(self.low - Delay(self.low,1)))
         
@@ -433,11 +437,11 @@ class Alphas191(Alphas):
         ####SUM(((HIGH+LOW)<=(DELAY(HIGH,1)+DELAY(LOW,1))?0:MAX(ABS(HIGH-DELAY(HIGH,1)),ABS(LOW-DELAY(LOW,1)))),12) / (SUM(((HIGH+LOW)<=(DELAY(HIGH,1)+DELAY(LOW,1))?0:MAX(ABS(HIGH-DELAY(HIGH,1)),ABS(LOW-DELAY(LOW,1)))),12)+SUM(((HIGH+LOW)>=(DELAY(HIGH,1)+DELAY(LOW,1))?0:MAX(ABS(HIGH-DELAY(HIGH,1)),ABS(LOW-DELAY(LOW,1)))),12))###
         cond = ((self.high + self.low) <= (Delay(self.high,1) + Delay(self.low,1)))
         part1 = self.close.copy(deep=True)
-        part1.loc[:, :] = None
+        part1.loc[:, :] = np.nan
         part1[cond] = 0
         part1[~cond] = Max(Abs(self.high - Delay(self.high,1)), Abs(self.low - Delay(self.low,1)))
         part2 = self.close.copy(deep=True)
-        part2.loc[:, :] = None
+        part2.loc[:, :] = np.nan
         part2[~cond] = 0
         part2[cond] = Max(Abs(self.high - Delay(self.high,1)), Abs(self.low - Delay(self.low,1)))
         
@@ -480,7 +484,7 @@ class Alphas191(Alphas):
         B = Rank((Rank(Corr(Sum(((self.high + self.low) / 2), 19),Sum(Mean(self.volume,40), 19), 13))**5))
         cond = (A < B)
         part = self.close.copy(deep=True)
-        part.loc[:, :] = None
+        part.loc[:, :] = np.nan
         part[cond] = 1
         part[~cond] = 0
         return part
@@ -502,7 +506,7 @@ class Alphas191(Alphas):
         cond2 = (self.close > Delay(self.close,1))
         cond3 = (self.close < Delay(self.close,1))
         part = self.close.copy(deep=True)
-        part.loc[:, :] = None
+        part.loc[:, :] = np.nan
         part[cond1] = 0
         part[cond2] = self.close - Min(self.low,Delay(self.close,1))
         part[cond3] = self.close - Max(self.low,Delay(self.close,1))
@@ -555,12 +559,12 @@ class Alphas191(Alphas):
         cond2 = (self.open >= Delay(self.open,1))
         
         DTM = self.close.copy(deep=True)
-        DTM.loc[:, :] = None
+        DTM.loc[:, :] = np.nan
         DTM[cond1] = 0
         DTM[~cond1] = Max((self.high-self.open),(self.open-Delay(self.open,1)))
         
         DBM = self.close.copy(deep=True)
-        DBM.loc[:, :] = None
+        DBM.loc[:, :] = np.nan
         DBM[cond2] = 0
         DBM[~cond2] = Max((self.open-self.low),(self.open-Delay(self.open,1)))
         
@@ -568,7 +572,7 @@ class Alphas191(Alphas):
         cond4 = (Sum(DTM,20)== Sum(DBM,20))
         cond5 = (Sum(DTM,20) < Sum(DBM,20))
         part = self.close.copy(deep=True)
-        part.loc[:, :] = None
+        part.loc[:, :] = np.nan
         part[cond3] = (Sum(DTM,20)-Sum(DBM,20))/Sum(DTM,20)
         part[cond4] = 0
         part[cond5] = (Sum(DTM,20)-Sum(DBM,20))/Sum(DBM,20)
@@ -636,7 +640,7 @@ class Alphas191(Alphas):
         cond2 = (self.close < Delay(self.close,1))
         cond3 = (self.close == Delay(self.close,1))  
         part = self.close.copy(deep=True)
-        part.loc[:, :] = None
+        part.loc[:, :] = np.nan
         part[cond1] = self.volume
         part[cond2] = 0
         part[cond3] = -self.volume 
@@ -653,7 +657,7 @@ class Alphas191(Alphas):
         cond2 = (A < 0.0)
         cond3 = ((0 <= A) & (A <= 0.25))
         part = self.close.copy(deep=True)
-        part.loc[:, :] = None
+        part.loc[:, :] = np.nan
         part[cond1] = -1
         part[cond2] = 1
         part[cond3] = -1*(self.close - Delay(self.close, 1))
@@ -687,7 +691,7 @@ class Alphas191(Alphas):
         ####SUM((OPEN>=DELAY(OPEN,1)?0:MAX((OPEN-LOW),(OPEN-DELAY(OPEN,1)))),20)###
         cond = (self.open >= Delay(self.open,1))
         part = self.close.copy(deep=True)
-        part.loc[:, :] = None
+        part.loc[:, :] = np.nan
         part[cond] = 0
         part[~cond] = Max((self.open-self.low),(self.open-Delay(self.open,1)))
         return Sum(part, 20)
@@ -698,7 +702,7 @@ class Alphas191(Alphas):
         cond2 = (self.close < Delay(self.close,1))
         cond3 = (self.close == Delay(self.close,1))
         part = self.close.copy(deep=True)
-        part.loc[:, :] = None
+        part.loc[:, :] = np.nan
         part[cond1] = self.volume
         part[cond2] = -1*self.volume
         part[cond3] = 0
@@ -720,7 +724,7 @@ class Alphas191(Alphas):
         ####((((DELTA((SUM(CLOSE, 100) / 100), 100) / DELAY(CLOSE, 100)) < 0.05) || ((DELTA((SUM(CLOSE, 100) / 100), 100) /DELAY(CLOSE, 100)) == 0.05)) ? (-1 * (CLOSE - TSMIN(CLOSE, 100))) : (-1 * DELTA(CLOSE, 3)))###
         cond = (Delta(Sum(self.close,100)/100, 100)/Delay(self.close, 100) <= 0.05)
         part = self.close.copy(deep=True)
-        part.loc[:, :] = None
+        part.loc[:, :] = np.nan
         part[cond] = -1 * (self.close - Tsmin(self.close, 100))
         part[~cond] = -1 * Delta(self.close, 3)
         return part
@@ -739,7 +743,7 @@ class Alphas191(Alphas):
         rank2 = Rank(Corr(Rank(((self.high * 0.1) + (self.vwap * 0.9))),Rank(self.volume), 11))
         cond = (rank1<rank2)
         part = self.close.copy(deep=True)
-        part.loc[:, :] = None
+        part.loc[:, :] = np.nan
         part[cond] = 1
         part[~cond] = 0
         return part
@@ -788,11 +792,11 @@ class Alphas191(Alphas):
         ####(SUM((CLOSE-DELAY(CLOSE,1)>0? CLOSE-DELAY(CLOSE,1):0),12) - SUM((CLOSE-DELAY(CLOSE,1)<0?ABS(CLOSE-DELAY(CLOSE,1)):0),12))/(SUM((CLOSE-DELAY(CLOSE,1)>0?CLOSE-DELAY(CLOSE,1):0),12) + SUM((CLOSE-DELAY(CLOSE,1)<0?ABS(CLOSE-DELAY(CLOSE,1)):0),12))*100     
         cond = (self.close-Delay(self.close,1) > 0)
         part1 = self.close.copy(deep=True)
-        part1.loc[:, :] = None
+        part1.loc[:, :] = np.nan
         part1[cond] = self.close-Delay(self.close,1)
         part1[~cond] = 0
         part2 = self.close.copy(deep=True)
-        part2.loc[:, :] = None
+        part2.loc[:, :] = np.nan
         part2[~cond] = Abs(self.close-Delay(self.close,1))
         part2[cond] = 0
         return (Sum(part1,12) - Sum(part2,12))/(Sum(part1,12) + Sum(part2,12))*100
@@ -843,7 +847,7 @@ class Alphas191(Alphas):
         B = Rank(Corr(self.low, self.volume,6))
         cond = (A < B)
         part = self.close.copy(deep=True)
-        part.loc[:, :] = None
+        part.loc[:, :] = np.nan
         part[cond] = -1
         part[~cond] = 0
         return part
@@ -869,11 +873,11 @@ class Alphas191(Alphas):
         A = (self.high+self.low+self.close)/3
         cond = (A > Delay(A,1))        
         part1 = self.close.copy(deep=True)
-        part1.loc[:, :] = None
+        part1.loc[:, :] = np.nan
         part1[cond] = A*self.volume
         part1[~cond] = 0
         part2 = self.close.copy(deep=True)
-        part2.loc[:, :] = None
+        part2.loc[:, :] = np.nan
         part2[~cond] = A*self.volume
         part2[cond] = 0
         return 100-(100/(1+Sum(part1,14)/Sum(part2,14)))
@@ -882,7 +886,7 @@ class Alphas191(Alphas):
         ####SUM((CLOSE-DELAY(CLOSE,1)<0?ABS(CLOSE-DELAY(CLOSE,1)):0),12)###
         cond = ((self.close-Delay(self.close,1)) < 0)
         part = self.close.copy(deep=True)
-        part.loc[:, :] = None
+        part.loc[:, :] = np.nan
         part[cond] = Abs(self.close-Delay(self.close,1))
         part[~cond] = 0
         return Sum(part, 12)
@@ -926,7 +930,7 @@ class Alphas191(Alphas):
         cond3 = ~cond1 & ~cond2       
         part0 = 16*(self.close + (self.close - self.open)/2 - Delay(self.open,1))
         part1 = self.close.copy(deep=True)
-        part1.loc[:, :] = None
+        part1.loc[:, :] = np.nan
         part1[cond1] = A + B/2 + D/4
         part1[cond2] = B + A/2 + D/4
         part1[cond3] = C + D/4  
@@ -980,7 +984,7 @@ class Alphas191(Alphas):
         ####((RANK(CORR((OPEN), SUM(MEAN(VOLUME,60), 9), 6)) < RANK((OPEN - TSMIN(OPEN, 14)))) * -1)###
         cond = (Rank(Corr((self.open), Sum(Mean(self.volume,60), 9), 6)) < Rank((self.open - Tsmin(self.open, 14))))
         part = self.close.copy(deep=True)
-        part.loc[:, :] = None
+        part.loc[:, :] = np.nan
         part[cond] = -1
         part[~cond] = 0
         return part
@@ -1009,7 +1013,7 @@ class Alphas191(Alphas):
         ####(((VWAP - MIN(VWAP, 16))) < (CORR(VWAP, MEAN(VOLUME,180), 18)))###
         cond = (((self.vwap - Tsmin(self.vwap, 16))) < (Corr(self.vwap, Mean(self.volume,180), 18)))
         part = self.close.copy(deep=True)
-        part.loc[:, :] = None
+        part.loc[:, :] = np.nan
         part[cond] = 1
         part[~cond] = 0
         return part
@@ -1038,7 +1042,7 @@ class Alphas191(Alphas):
         ####SMA((CLOSE<=DELAY(CLOSE,1)?STD(CLOSE,20):0),20,1)###
         cond = (self.close<=Delay(self.close,1))
         part = self.close.copy(deep=True)
-        part.loc[:, :] = None
+        part.loc[:, :] = np.nan
         part[cond] = Std(self.close,20)
         part[~cond] = 0
         return Sma(part, 20, 1)
@@ -1059,7 +1063,7 @@ class Alphas191(Alphas):
         ####SMA(( ((CLOSE>DELAY(CLOSE,1))?1/(CLOSE-DELAY(CLOSE,1)):1) - MIN( ((CLOSE>DELAY(CLOSE,1))?1/(CLOSE-DELAY(CLOSE,1)):1) ,12) )/(HIGH-LOW)*100,13,2)###
         cond = (self.close>Delay(self.close,1))
         part = self.close.copy(deep=True)
-        part.loc[:, :] = None
+        part.loc[:, :] = np.nan
         part[cond] = 1/(self.close-Delay(self.close,1))
         part[~cond] = 1
 
@@ -1086,7 +1090,7 @@ class Alphas191(Alphas):
         ####SUM((CLOSE-DELAY(CLOSE,1)>0?CLOSE-DELAY(CLOSE,1):0),12)###
         cond = (self.close > Delay(self.close,1))
         part = self.close.copy(deep=True)
-        part.loc[:, :] = None
+        part.loc[:, :] = np.nan
         part[cond] = self.close-Delay(self.close,1)
         part[~cond] = 0
         return Sum(part,12)
@@ -1115,11 +1119,11 @@ class Alphas191(Alphas):
         cond1 = ((LD>0) & (LD>HD))
         cond2 = ((HD>0) & (HD>LD)) 
         part1 = self.close.copy(deep=True)
-        part1.loc[:, :] = None
+        part1.loc[:, :] = np.nan
         part1[cond1] = LD
         part1[~cond1] = 0
         part2 = self.close.copy(deep=True)
-        part2.loc[:, :] = None
+        part2.loc[:, :] = np.nan
         part2[cond2] = HD
         part2[~cond2] = 0
         return Mean(Abs(Sum(part1,14)*100/Sum(TR,14)-Sum(part2,14)*100/Sum(TR,14))/(Sum(part1,14)*100/Sum(TR,14)+Sum(part2,14)*100/Sum(TR,14))*100,6)
@@ -1132,7 +1136,7 @@ class Alphas191(Alphas):
         ####SMA((CLOSE>DELAY(CLOSE,1)?STD(CLOSE,20):0),20,1)###
         cond = (self.close>Delay(self.close,1))
         part = self.close.copy(deep=True)
-        part.loc[:, :] = None
+        part.loc[:, :] = np.nan
         part[cond] = Std(self.close,20)
         part[~cond] = 0
         return Sma(part,20,1)
@@ -1161,7 +1165,7 @@ class Alphas191(Alphas):
         ####((MEAN(VOLUME,20) < VOLUME) ? ((-1 * TSRANK(ABS(DELTA(CLOSE, 7)), 60)) * SIGN(DELTA(CLOSE, 7)) : (-1 *VOLUME)))
         cond = (Mean(self.volume,20) < self.volume)
         part = self.close.copy(deep=True)
-        part.loc[:, :] = None
+        part.loc[:, :] = np.nan
         part[cond] = (-1 * Tsrank(Abs(Delta(self.close, 7)), 60)) * Sign(Delta(self.close, 7)) 
         part[~cond] = -1 * self.volume
         return part
@@ -1197,11 +1201,11 @@ class Alphas191(Alphas):
         cond1 = ((LD>0) & (LD>HD))
         cond2 = ((HD>0) & (HD>LD)) 
         part1 = self.close.copy(deep=True)
-        part1.loc[:, :] = None
+        part1.loc[:, :] = np.nan
         part1[cond1] = LD
         part1[~cond1] = 0
         part2 = self.close.copy(deep=True)
-        part2.loc[:, :] = None
+        part2.loc[:, :] = np.nan
         part2[cond2] = HD
         part2[~cond2] = 0
         return (Mean(Abs(Sum(part1,14)*100/Sum(TR,14)-Sum(part2,14)*100/Sum(TR,14))/(Sum(part1,14)*100/Sum(TR,14)+Sum(part2,14)*100/Sum(TR,14))*100,6)+Delay(Mean(Abs(Sum(part1,14)*100/Sum(TR,14)-Sum(part2,14)*100/Sum(TR,14))/(Sum(part1,14)*100/Sum(TR,14)+Sum(part2,14)*100/Sum(TR,14))*100,6),6))/2
@@ -1210,7 +1214,7 @@ class Alphas191(Alphas):
         ####SUM((OPEN<=DELAY(OPEN,1)?0:MAX((HIGH-OPEN),(OPEN-DELAY(OPEN,1)))),20)###
         cond = (self.open<=Delay(self.open,1))
         part = self.close.copy(deep=True)
-        part.loc[:, :] = None
+        part.loc[:, :] = np.nan
         part[cond] = 0
         part[~cond] = Max((self.high-self.open),(self.open-Delay(self.open,1)))
         return Sum(part,20) 
@@ -1232,12 +1236,25 @@ class Alphas191(Alphas):
         return ((Corr(Mean(self.volume,20), self.low, 5) + ((self.high + self.low) / 2)) - self.close)
     
 if __name__ == '__main__':
-    year = '2019'
-    list_assets,df_asserts = get_hs300_stocks(f'{year}-01-01')
+    parser = argparse.ArgumentParser(description='计算 Alpha191 因子')
+    parser.add_argument('--year', help='年份，默认今年')
+    parser.add_argument('--alphas', help='因子编号，逗号分隔。不传则计算全部')
+    named_argv = ['--' + arg if '=' in arg and not arg.startswith('-') else arg for arg in sys.argv[1:]]
+    args = parser.parse_args(named_argv)
 
-    ################ 计算所有 #################    
-    Alphas191.generate_alphas(year, list_assets,"sh000300")
+    year = args.year if args.year else str(date.today().year)
+    list_assets, df_asserts = get_hs300_stocks(f'{year}-01-01')
 
-    ################ 计算单个 #################
-    # ret = Alphas191.generate_alpha_single('alpha170', year, list_assets, "sh000300", True)
-    # print(ret)
+    if not args.alphas:
+        # 没有指定编号，计算全部因子
+        Alphas191.generate_alphas(year, list_assets, "sh000300")
+    else:
+        # 按传入编号逐个计算并保存
+        for num in args.alphas.replace('，', ',').split(','):
+            num = num.strip()
+            if not num:
+                continue
+            if num.lower().startswith('alpha'):
+                num = num[5:]
+            alpha_name = f'alpha{int(num):03d}'
+            Alphas191.generate_alpha_single(alpha_name, year, list_assets, "sh000300", True)

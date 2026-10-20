@@ -1,0 +1,20 @@
+---
+description: 优先用现成库，避免重复实现已有能力
+alwaysApply: true
+---
+
+# 优先使用现成库
+
+实现功能前先查：PyPI、项目已有依赖、标准库里是否已有成熟实现。有则用库，不要自己写平行实现。
+
+- 跨进程文件锁用 `filelock.FileLock`，不要再写 `msvcrt`/`fcntl` 封装
+- 新增依赖选维护中、接口稳定、体积合理的包；写入 `pyproject.toml` / `uv.lock` 后，按 `cleanup-and-deps` 规则同时装进系统 Python 和 `.venv`
+- 只有库明显不适合（许可证、体积、Windows/QMT 环境、API 对不上）才允许自写，并在代码或文档里写清原因
+
+```python
+# 不要
+from qmtmini_ext.file_lock import InterProcessFileLock
+
+# 要
+from filelock import FileLock
+```

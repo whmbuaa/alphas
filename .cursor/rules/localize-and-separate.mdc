@@ -1,0 +1,54 @@
+---
+description: 不同功能块用空行隔开；用到的代码写在使用处附近
+alwaysApply: true
+---
+
+# 功能分隔与代码局部化
+
+不同功能写在一起时，谁用就写在谁旁边；块与块之间用空行分开，不要把下一件事的准备代码插在上一件事中间。
+
+- 一个功能块有三行及以上时，和相邻的其他功能之间空一行。一两行的短句可以紧挨着，不必硬拆
+- `continue` / `return` 结束的功能块，和后面另一段功能之间空一行，即使两边都不到三行
+- 只为某条 log、某次调用准备的变量，写在那条语句紧前面，不要提前算完再去做别的事
+- 给后面用的默认值（如 `suffix = ""`）也一样：和真正赋值、使用它的 `if`/`else` 放在一起，不要搁在更上面的无关代码之前
+
+```python
+# 不要：空默认值搁在 next 前面
+tick_delay_suffix = ""
+incr_tick_df = next(...)
+if incr_tick_df is not None:
+    tick_delay_suffix = f"，延迟 {delay_s:.3f}s"
+logger.info("...%s", tick_delay_suffix)
+
+# 要：默认值和有内容的赋值都贴着 log
+incr_tick_df = next(...)
+if incr_tick_df is not None:
+    tick_delay_suffix = f"，延迟 {delay_s:.3f}s"
+else:
+    tick_delay_suffix = ""
+logger.info("...%s", tick_delay_suffix)
+```
+- 同一 `with` / 循环里可以连续做几件事，但每件事自己聚拢，块与块之间仍空一行
+
+```python
+# 不要：转 timetag 插在 keys 统计和它的 log 中间
+n_keys = len(latest_ticks)
+n_values = len(latest_ticks.values())
+time_tag = TimeTag(int(latest_tick_df["timetag"].iloc[0]))
+latest_tick_df["timetag"] = f"{time_tag.hour:02d}:{time_tag.minute:02d}:{time_tag.second:02d}"
+logger.info("latest_ticks keys=%s values=%s", n_keys, n_values)
+logger.info("%s\n%s", stock_code, latest_tick_df.to_string())
+
+# 要：各功能聚在自己的 log 旁；continue 与下一块空一行
+n_keys = len(latest_ticks)
+n_values = len(latest_ticks.values())
+logger.info("latest_ticks keys=%s values=%s", n_keys, n_values)
+
+if not latest_ticks:
+    continue
+
+stock_code, latest_tick_df = next(iter(latest_ticks.items()))
+time_tag = TimeTag(int(latest_tick_df["timetag"].iloc[0]))
+latest_tick_df["timetag"] = f"{time_tag.hour:02d}:{time_tag.minute:02d}:{time_tag.second:02d}"
+logger.info("%s\n%s", stock_code, latest_tick_df.to_string())
+```

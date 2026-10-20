@@ -1,0 +1,29 @@
+---
+description: import 只写在文件头，不要在函数或分支里再 import
+alwaysApply: true
+---
+
+# import 放文件头
+
+所有 `import` / `from ... import` 写在模块顶部（`from __future__ import` 之后）。不要在函数、方法、`if` 里再 import。
+
+可选依赖用文件头的 `try/except ImportError`，不要把 import 藏进函数。
+
+```python
+# 不要
+def start(self):
+    from qmtmini_ext.market_util import get_stock_codes
+    self.stock_codes = get_stock_codes()
+
+def _read_live_ticks(self):
+    from xtquant import xtdata
+    from qmtmini_ext.tick_convert import tick2df
+
+# 要
+from xtquant import xtdata
+from qmtmini_ext.market_util import get_stock_codes
+from qmtmini_ext.tick_convert import tick2df
+
+def start(self):
+    self.stock_codes = get_stock_codes()
+```

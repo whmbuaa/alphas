@@ -286,11 +286,14 @@ def compute_forward_returns(factor,
     raw_values_dict = {}
     column_list = []
 
+    # 先向前填充，等价于旧版 pct_change 默认的 fill_method='pad'。
+    filled_prices = prices.ffill()
+
     for period in sorted(periods):
         if cumulative_returns:
-            returns = prices.pct_change(period)
+            returns = filled_prices.pct_change(period, fill_method=None)
         else:
-            returns = prices.pct_change()
+            returns = filled_prices.pct_change(fill_method=None)
 
         forward_returns = \
             returns.shift(-period).reindex(factor_dateindex)
@@ -904,20 +907,24 @@ def get_forward_returns_columns(columns, require_exact_day_multiple=False):
     Utility that detects and returns the columns that are forward returns
     """
 
-    # If exact day multiples are required in the forward return periods,
-    # drop all other columns (e.g. drop 3D12h).
-    if require_exact_day_multiple:
-        pattern = re.compile(r"^(\d+([D]))+$", re.IGNORECASE)
-        valid_columns = [(pattern.match(col) is not None) for col in columns]
+    # 日倍数，如 1D、5D。3D12h 这类不算。
+    day_pattern = re.compile(r"^(\d+D)+$", re.IGNORECASE)
+    # 任意收益周期，如 1D、2h、3D12h。factor 这类列对不上。
+    period_pattern = re.compile(r"^(\d+([Dhms]|ms|us|ns))+$", re.IGNORECASE)
 
-        if sum(valid_columns) < len(valid_columns):
+    if require_exact_day_multiple:
+        valid_columns = [day_pattern.match(col) is not None for col in columns]
+        skipped = [
+            col for col in columns
+            if period_pattern.match(col) is not None and day_pattern.match(col) is None
+        ]
+        if skipped:
             warnings.warn(
                 "Skipping return periods that aren't exact multiples"
                 + " of days."
             )
     else:
-        pattern = re.compile(r"^(\d+([Dhms]|ms|us|ns]))+$", re.IGNORECASE)
-        valid_columns = [(pattern.match(col) is not None) for col in columns]
+        valid_columns = [period_pattern.match(col) is not None for col in columns]
 
     return columns[valid_columns]
 

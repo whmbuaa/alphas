@@ -388,7 +388,7 @@ def create_information_tear_sheet(
             factor_data,
             group_adjust=group_neutral,
             by_group=False,
-            by_time="M",
+            by_time="ME",
         )
         ax_monthly_ic_heatmap = [gf.next_cell() for x in range(fr_cols)]
         plotting.plot_monthly_ic_heatmap(

@@ -3,6 +3,7 @@
   "workbench.editorAssociations": {
     "**/docs/alphas191-alpha083-2019/*.md": "vscode.markdown.preview.editor",
     "**/docs/alpha191/**/*.md": "vscode.markdown.preview.editor",
-    "**/docs/alpha101/**/*.md": "vscode.markdown.preview.editor"
+    "**/docs/alpha101/**/*.md": "vscode.markdown.preview.editor",
+    "**/docs/performace_test.md": "vscode.markdown.preview.editor"
   }
 }

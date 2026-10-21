@@ -9,13 +9,8 @@ try:
 except ImportError:
     load_dotenv = None
 
-try:
-    import tushare_ext
-except ImportError:
-    tushare_ext = None
 
-
-# 从本仓库 .env、环境变量，或已安装的 tushare_ext 项目配置里取 token。
+# 从本仓库 .env 或环境变量里取 token。
 # 参数:
 #     无
 # 返回:
@@ -25,9 +20,6 @@ except ImportError:
 def _token():
     if load_dotenv is not None:
         load_dotenv(Path(__file__).resolve().parent / ".env")
-        if tushare_ext is not None:
-            ext_env = Path(tushare_ext.__file__).resolve().parents[1] / ".env"
-            load_dotenv(ext_env)
 
     token = os.getenv("TUSHARE_TOKEN", "").strip()
     if not token:

@@ -73,7 +73,7 @@ def generate_year_report(alpha_name, list_assets, year):
 
 def compare_factor(g_name, start, end):
     list_df = []
-    for i in range(start,end):
+    for i in range(start,end+1):
         df = pd.read_csv(f'analysis/{g_name}_{i}_result.csv')
         df['year'] = i
         list_df.append(df)
@@ -84,7 +84,7 @@ def compare_factor(g_name, start, end):
     returns = df_all.pivot(index='name', columns='year', values='return_max')
     ranks = returns.rank(axis=0, method='min', pct=True)
     print(ranks)
-    weights = np.array(range(1, 11))
+    weights = np.array(range(1, end - start + 2))
     sum_weights = np.sum(weights)
     ranks['avg'] = (ranks*weights).sum(axis="columns")
     print(ranks)
